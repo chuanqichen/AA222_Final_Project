@@ -1,0 +1,9 @@
+_target_: evojax.Trainer
+max_iter: 5000
+log_interval: 100
+test_interval: 1000
+n_repeats: 1
+n_evaluations: 1
+seed: ${seed}
+log_dir: log_dir
+logger: logger
