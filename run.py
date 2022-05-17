@@ -22,6 +22,7 @@ def main(cfg):
     # logger = util.create_logger(
     #     name='MNIST', log_dir=log_dir, debug=cfg.debug)
     logger = None
+    log_dir = "output"
 
     policy = instantiate(cfg.policy, logger=logger)
     train_task = instantiate(cfg.train_task)
@@ -38,7 +39,7 @@ def main(cfg):
         train_task = train_task,
         test_task = test_task,
         logger = logger,
-        log_dir = "output"
+        log_dir = log_dir
     )
 
     # Train the model
