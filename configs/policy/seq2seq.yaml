@@ -1,0 +1,2 @@
+_target_: evojax.policy.seq2seq.Seq2seqPolicy
+hidden_size: ???

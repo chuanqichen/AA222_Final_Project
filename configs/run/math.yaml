@@ -1,0 +1,22 @@
+# @package _global_
+defaults:
+  - override /task: math
+  - override /policy: seq2seq
+  - override /solver: pgpe
+
+policy:
+  hidden_size: 128
+  
+solver:
+  pop_size: 1024
+  center_learning_rate: 0.01
+  stdev_learning_rate: 0.03
+  init_stdev: 0.05
+  optimizer: adam
+
+trainer:
+  max_iter: 50000
+  log_interval: 100
+  test_interval: 1000
+  n_repeats: 1
+  n_evaluations: 100
