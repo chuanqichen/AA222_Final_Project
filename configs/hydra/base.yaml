@@ -4,7 +4,6 @@ defaults:
 
 job:
   name: ${get_class_name:${task}}_${get_class_name:${solver}}
-  # chdir: False
 run:
   dir: output/${get_class_name:${task}}/${get_class_name:${solver}}/${now:%Y-%m-%d_%H-%M-%S}
 # sweep:
