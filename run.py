@@ -16,9 +16,25 @@ def main(cfg):
     if cfg.gpu_id is not None: 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
 
-    policy = instantiate(cfg.policy)
     train_task = instantiate(cfg.task, test = False)
     test_task = instantiate(cfg.task, test = True)
+
+    #* policy is handled differently depending on task
+    policy_name = HydraConfig.get().runtime.choices.policy
+    if policy_name == "mlp_pi":
+        policy = instantiate(
+            cfg.policy,
+            act_dim = train_task.act_shape[0]
+        )
+    elif policy_name == "mlp":
+        policy = instantiate(
+            cfg.policy,
+            input_dim = train_task.obs_shape[0],
+            output_dim = train_task.act_shape[0]
+        )
+    else:
+        policy = instantiate(cfg.policy)
+
     solver = instantiate(
         cfg.solver,
         param_size = policy.num_params,

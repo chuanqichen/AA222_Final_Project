@@ -1,0 +1,2 @@
+_target_: evojax.policy.MLPPolicy
+hidden_dims: [32,32]

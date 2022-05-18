@@ -1,0 +1,2 @@
+_target_: evojax.policy.PermutationInvariantPolicy
+hidden_dim: 128

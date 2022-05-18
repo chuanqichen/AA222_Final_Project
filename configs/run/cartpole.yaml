@@ -1,0 +1,23 @@
+# @package _global_
+defaults:
+  - override /task: cartpole
+  - override /policy: mlp_pi
+  - override /solver: cma
+
+task:
+  harder: true
+  
+# policy:
+#   hidden_dim: 128
+# this only works for MLP_PI, not MLP. workaround is to hardcode in mlp.yaml
+  
+solver:
+  pop_size: 256
+  init_stdev: 0.1
+
+trainer:
+  max_iter: 20000
+  log_interval: 20
+  test_interval: 100
+  n_repeats: 16
+  n_evaluations: 100

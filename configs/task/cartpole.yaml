@@ -1,0 +1,3 @@
+_target_: evojax.task.cartpole.CartPoleSwingUp
+test: False
+harder: False
