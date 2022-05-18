@@ -4,6 +4,7 @@ defaults:
   - solver: pgpe
   - trainer: trainer
   - hydra: base
+  - wandb: disabled
   - _self_
 
 seed: 42
