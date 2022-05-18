@@ -1,6 +1,6 @@
-# defaults:
-#   - override job_logging: colorlog
-#   - override hydra_logging: colorlog
+defaults:
+  - override job_logging: colorlog
+  - override hydra_logging: colorlog
 
 job:
   name: ${get_class_name:${task}}_${get_class_name:${solver}}
