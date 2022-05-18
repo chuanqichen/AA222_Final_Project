@@ -1,4 +1,4 @@
 _target_: evojax.task.mnist.MNIST
 batch_size: 1024
 test: False
-fp: ${get_original_cwd:test}/data
+fp: ${hydra:runtime.cwd}/data

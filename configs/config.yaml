@@ -1,7 +1,6 @@
 defaults:
   - policy: cnn
-  - train_task: mnist
-  - test_task: mnist
+  - task: mnist
   - solver: pgpe
   - trainer: trainer
   - hydra: base
@@ -9,9 +8,7 @@ defaults:
 
 
 seed: 42
-# log_dir:
+log_dir: output
 # logger:
 debug: False
 gpu_id: 0
-
-# ${hydra:runtime.cwd}/

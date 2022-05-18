@@ -22,11 +22,10 @@ def main(cfg):
     # logger = util.create_logger(
     #     name='MNIST', log_dir=log_dir, debug=cfg.debug)
     logger = None
-    log_dir = "output"
 
     policy = instantiate(cfg.policy, logger=logger)
-    train_task = instantiate(cfg.train_task)
-    test_task = instantiate(cfg.test_task)
+    train_task = instantiate(cfg.task, test = False)
+    test_task = instantiate(cfg.task, test = True)
     solver = instantiate(
         cfg.solver,
         param_size = policy.num_params,
@@ -39,17 +38,17 @@ def main(cfg):
         train_task = train_task,
         test_task = test_task,
         logger = logger,
-        log_dir = log_dir
+        log_dir = cfg.log_dir
     )
 
     # Train the model
     trainer.run(demo_mode=False)
 
     # Test the final model.
-    src_file = os.path.join(log_dir, 'best.npz')
-    tar_file = os.path.join(log_dir, 'model.npz')
+    src_file = os.path.join(cfg.log_dir, 'best.npz')
+    tar_file = os.path.join(cfg.log_dir, 'model.npz')
     shutil.copy(src_file, tar_file)
-    trainer.model_dir = log_dir
+    trainer.model_dir = cfg.log_dir
     trainer.run(demo_mode=True)
 
 

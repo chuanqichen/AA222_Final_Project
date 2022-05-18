@@ -3,10 +3,10 @@
 #   - override hydra_logging: colorlog
 
 job:
-  name: ${get_class_name:${test_task}}_${get_class_name:${solver}}
+  name: ${get_class_name:${task}}_${get_class_name:${solver}}
   # chdir: False
 run:
-  dir: output/${get_class_name:${test_task}}/${get_class_name:${solver}}/${now:%Y-%m-%d_%H-%M-%S}
+  dir: output/${get_class_name:${task}}/${get_class_name:${solver}}/${now:%Y-%m-%d_%H-%M-%S}
 # sweep:
 #   dir: multirun/${hydra.job.name}/${list2str:${data.features}}/${now:%Y-%m-%d_%H-%M-%S}
 #   subdir: ${hydra.job.override_dirname}
