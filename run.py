@@ -5,6 +5,7 @@ from evojax import util
 import hydra
 from hydra.core.hydra_config import HydraConfig
 from hydra.utils import instantiate
+import jax
 from omegaconf import OmegaConf
 import wandb
 
@@ -13,6 +14,7 @@ OmegaConf.register_new_resolver("get_class_name", lambda x: x._target_.split("."
 @hydra.main(config_path="configs", config_name="config", version_base=None) # version base since I am using hydra 1.2
 def main(cfg):
     wandb.init(**cfg.wandb)    
+    cfg_tree = HydraConfig.get()
     if cfg.gpu_id is not None: 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
 
@@ -20,7 +22,7 @@ def main(cfg):
     test_task = instantiate(cfg.task, test = True)
 
     #* policy is handled differently depending on task
-    policy_name = HydraConfig.get().runtime.choices.policy
+    policy_name = cfg_tree.runtime.choices.policy
     if policy_name == "mlp_pi":
         policy = instantiate(
             cfg.policy,
@@ -56,6 +58,40 @@ def main(cfg):
     shutil.copy(src_file, tar_file)
     trainer.model_dir = cfg.log_dir
     trainer.run(demo_mode=True)
+
+    # * Save out a gif if doing control tasks like cartpole
+    if cfg_tree.runtime.choices.task == "cartpole":
+        task_reset_fn = jax.jit(test_task.reset)
+        policy_reset_fn = jax.jit(policy.reset)
+        step_fn = jax.jit(test_task.step)
+        act_fn = jax.jit(policy.get_actions)
+        rollout_key = jax.random.PRNGKey(seed=0)[None, :]
+
+        best_params = trainer.solver.best_params[None, :]
+        images = []
+        task_s = task_reset_fn(rollout_key)
+        policy_s = policy_reset_fn(task_s)
+        images.append(test_task.render(task_s, 0))
+        done = False
+        step = 0
+        while not done:
+            act, policy_s = act_fn(task_s, best_params, policy_s)
+            task_s, r, d = step_fn(task_s, act)
+            step += 1
+            done = bool(d[0])
+            if step % 5 == 0:
+                images.append(test_task.render(task_s, 0))
+
+        gif_file = os.path.join(
+            cfg.log_dir,
+            'cartpole_{}.gif'.format('hard' if cfg.task.harder else 'easy')
+        )
+
+        images[0].save(
+            gif_file, save_all=True,
+            append_images=images[1:], duration=40, loop=0
+        )
+        # logger.info('GIF saved to {}'.format(gif_file))
 
 
 if __name__ == '__main__':

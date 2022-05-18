@@ -5,4 +5,4 @@ test_interval: ???
 n_repeats: ???
 n_evaluations: ???
 seed: ${seed}
-log_dir: ${hydra:run.dir}/output
+log_dir: ${hydra:run.dir}
