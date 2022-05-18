@@ -7,29 +7,21 @@ from hydra.core.hydra_config import HydraConfig
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 import wandb
-OmegaConf.register_new_resolver("get_class_name", lambda x: x._target_.split(".")[-1])
-OmegaConf.register_new_resolver("get_original_cwd", lambda _: hydra.utils.get_original_cwd())
 
-wandb.init(project="aa222_final", mode="disabled")
+OmegaConf.register_new_resolver("get_class_name", lambda x: x._target_.split(".")[-1])
+
 @hydra.main(config_path="configs", config_name="config", version_base=None) # version base since I am using hydra 1.2
 def main(cfg):
+    wandb.init(project="aa222_final", mode="disabled")    
     if cfg.gpu_id is not None: 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
 
-    # log_dir = './output/mnist'
-    # if not os.path.exists(log_dir):
-    #     os.makedirs(log_dir, exist_ok=True)
-    # logger = util.create_logger(
-    #     name='MNIST', log_dir=log_dir, debug=cfg.debug)
-    logger = None
-
-    policy = instantiate(cfg.policy, logger=logger)
+    policy = instantiate(cfg.policy)
     train_task = instantiate(cfg.task, test = False)
     test_task = instantiate(cfg.task, test = True)
     solver = instantiate(
         cfg.solver,
         param_size = policy.num_params,
-        logger = logger
     )
     trainer = instantiate(
         cfg.trainer,
@@ -37,8 +29,6 @@ def main(cfg):
         solver = solver,
         train_task = train_task,
         test_task = test_task,
-        logger = logger,
-        log_dir = cfg.log_dir
     )
 
     # Train the model
