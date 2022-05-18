@@ -6,9 +6,7 @@ defaults:
   - hydra: base
   - _self_
 
-
 seed: 42
 log_dir: ${trainer.log_dir}
-# logger:
 debug: False
 gpu_id: 0
