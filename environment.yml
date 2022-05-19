@@ -96,6 +96,9 @@ dependencies:
   - zeromq=4.3.4=h9c3ff4c_0
   - zlib=1.2.11=h7f8727e_4
   - pip:
+    - hydra-core
+    - hydra_colorlog
+    - wandb
     - absl-py==1.0.0
     - attrs==21.4.0
     - charset-normalizer==2.0.12
