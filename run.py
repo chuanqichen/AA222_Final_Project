@@ -13,7 +13,10 @@ OmegaConf.register_new_resolver("get_class_name", lambda x: x._target_.split("."
 
 @hydra.main(config_path="configs", config_name="config", version_base=None) # version base since I am using hydra 1.2
 def main(cfg):
-    wandb.init(**cfg.wandb)    
+    cfg_dict = OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True)
+    wandb.init(**cfg.wandb, config= cfg_dict)    
+
     cfg_tree = HydraConfig.get()
     if cfg.gpu_id is not None: 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
