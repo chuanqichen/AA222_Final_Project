@@ -12,9 +12,12 @@ To setup jax on GPU:
  1. pip install --upgrade jax==0.3.10 jaxlib==0.3.10+cuda11.cudnn82 -f https://storage.googleapis.com/jax-releases/jax_releases.html
 2. NVIDIA-SMI 515.43.04    Driver Version: 515.43.04    CUDA Version: 11.7 
 3. Install cudnn 
-download and "mv cudnn-linux-x86_64-8.4.0.27_cuda11.6-archive/ /root/local/cudnn-8.4"
-LD_LIBRARY_PATH=/usr/local/cudnn-8.4/lib
-PATH=/usr/local/cudnn-8.4/bin:$PATH
+Download and install cudnn: 
+tar -xvf cudnn-linux-x86_64-8.4.0.27_cuda11.6-archive.tar.xz 
+cp -r cudnn-linux-x86_64-8.4.0.27_cuda11.6-archive /usr/local/
+in .bashrc add: 
+export PATH=/usr/local/cudnn-8.4/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cudnn-8.4/lib:$LD_LIBRARY_PATH
 
 pip install hydra-core
 pip install hydra_colorlog --upgrade
