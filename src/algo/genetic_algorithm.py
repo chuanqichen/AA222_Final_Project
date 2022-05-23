@@ -62,8 +62,9 @@ class GeneticAlgorithm(NEAlgorithm):
         #* ask() + elitism
         def gaussian_mutation(key: jnp.ndarray, params: ndarray) -> Tuple[jnp.ndarray, ndarray]:
             key, subkey = jax.random.split(key)
-            perturbations = jax.random.normal(subkey, shape = (self.pop_size-1, self.param_size))
-            perturbations = jnp.vstack((perturbations, jnp.zeros(1, self.param_size)))
+            gaussian_noise = jax.random.normal(subkey, shape = (self.pop_size-1, self.param_size))
+            null_noise = jnp.zeros((1, self.param_size)) # placeholder for elitism
+            perturbations = jnp.vstack((gaussian_noise, null_noise))
             next_generation = params + perturbations * self.sigma
             return key, next_generation
 
@@ -90,7 +91,7 @@ class GeneticAlgorithm(NEAlgorithm):
 
     @property
     def best_params(self) -> jnp.ndarray:
-        return self.jnp_array(self._best_params)
+        return jnp_array(self._best_params)
     
     @best_params.setter
     def best_params(self, params: ndarray) -> None:
