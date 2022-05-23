@@ -10,10 +10,13 @@ job:
         - run
         - mode
         - trainer.max_iter
+  # env_set:
+  #   CUDA_VISIBLE_DEVICES: ${hydra:job.num}
+
 run:
   dir: output/${get_class_name:${task}}/${get_class_name:${solver}}/${now:%Y-%m-%d_%H-%M-%S}
 sweep:
-  dir: multirun/${now:%Y-%m-%d_%H-%M-%S}/${hydra.job.name}/
+  dir: multirun/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}/
   subdir: ${hydra.job.override_dirname}
 
 # job_logging:

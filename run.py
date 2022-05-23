@@ -11,21 +11,26 @@ import wandb
 
 OmegaConf.register_new_resolver("get_class_name", lambda x: x._target_.split(".")[-1])
 
+id = wandb.util.generate_id()
+
 @hydra.main(config_path="configs", config_name="config", version_base=None) # version base since I am using hydra 1.2
 def main(cfg):
     cfg_dict = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
-    wandb.init(**cfg.wandb, config= cfg_dict)    
+    cfg_hydra = HydraConfig.get()
+    log_dir = cfg_hydra.runtime.output_dir
 
-    cfg_tree = HydraConfig.get()
-    log_dir = cfg_tree.runtime.output_dir
+    group = f"{cfg_hydra.job.name}-{id}" if "MULTIRUN" in str(cfg_hydra.mode) else None
+    run = wandb.init(**cfg.wandb, config= cfg_dict, reinit=True, group=group)    
+
     if cfg.gpu_id is not None: 
-        os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
+        os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+    # os.environ['CUDA_VISIBLE_DEVICES'] = cfg_hydra.job.env_set.CUDA_VISIBLE_DEVICES
 
     train_task = instantiate(cfg.task, test = False)
     test_task = instantiate(cfg.task, test = True)
 
     #* policy is handled differently depending on task
-    policy_name = cfg_tree.runtime.choices.policy
+    policy_name = cfg_hydra.runtime.choices.policy
     if policy_name == "mlp_pi":
         policy = instantiate(
             cfg.policy,
@@ -64,7 +69,7 @@ def main(cfg):
     trainer.run(demo_mode=True)
 
     # * Save out a gif if doing control tasks like cartpole
-    if cfg_tree.runtime.choices.task == "cartpole":
+    if cfg_hydra.runtime.choices.task == "cartpole":
         task_reset_fn = jax.jit(test_task.reset)
         policy_reset_fn = jax.jit(policy.reset)
         step_fn = jax.jit(test_task.step)
@@ -100,6 +105,7 @@ def main(cfg):
             {"video": wandb.Video(gif_file, fps=4, format="gif")}
         )
 
+    run.finish()
 
 if __name__ == '__main__':
     main()
