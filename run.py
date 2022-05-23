@@ -95,6 +95,9 @@ def main(cfg):
             append_images=images[1:], duration=40, loop=0
         )
         # logger.info('GIF saved to {}'.format(gif_file))
+        wandb.log(
+            {"video": wandb.Video(gif_file, fps=4, format="gif")}
+        )
 
 
 if __name__ == '__main__':
