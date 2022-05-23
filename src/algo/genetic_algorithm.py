@@ -29,16 +29,22 @@ Softmax Function is a common approach.
 jnp_array = jax.jit(jnp.array)
 ndarray = Union[np.ndarray, jnp.ndarray]
 
+"""
+Simple genetic algorithm for neuroevolution with gaussian mutation and no crossover
+selection method can be chosen from [truncation, tournament, roulette]
+eliteism is applied in the mutation stage
+"""
+
 class GeneticAlgorithm(NEAlgorithm):
 
     def __init__(self,
                  param_size: int,
-                 pop_size: int,
-                 selection_method: str = "truncation",
+                 selection: str = "truncation",
+                 pop_size: int = 64,
                  elite_size: int = None,
                  sigma: float = 0.01,
                  seed: int = 0,
-                 logger: logging.logger = None
+                 logger: logging.Logger = None
                  ):
     
         self.logger = create_logger(name='GeneticAlgortihm') if logger is None else logger
@@ -53,18 +59,22 @@ class GeneticAlgorithm(NEAlgorithm):
         #controls top K in truncation, random K  in tournament. not used for roulette
         self.elite_size = elite_size 
 
-        #* ask()
+        #* ask() + elitism
         def gaussian_mutation(key: jnp.ndarray, params: ndarray) -> Tuple[jnp.ndarray, ndarray]:
             key, subkey = jax.random.split(key)
-            perturbations = jax.random.normal(subkey, shape = (self.pop_size, self.param_size))
+            perturbations = jax.random.normal(subkey, shape = (self.pop_size-1, self.param_size))
+            perturbations = jnp.vstack((perturbations, jnp.zeros(1, self.param_size)))
             next_generation = params + perturbations * self.sigma
             return key, next_generation
 
         #* tell() choices: truncation, tournament, roulette
         def truncation(fitness: ndarray, params: ndarray) -> ndarray:
             params = params[fitness.argsort(axis=0)] # params sorted from least to most fit
-            params = params[-self.elite_size] # params truncated to only most fit K individuals
-            params = jax.random.choice(self.rng_key, params, shape=[self.pop_size])
+            best_param = params[-1]
+            params = params[-self.elite_size:] # params truncated to most fit K individuals
+            # sample pop_size individuals from elite population
+            params = jax.random.choice(self.rng_key, params, shape=[self.pop_size-1])
+            params = jnp.vstack((params, best_param))
             return params
 
         self.ask_fn = jax.jit(gaussian_mutation)

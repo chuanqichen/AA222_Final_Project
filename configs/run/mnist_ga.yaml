@@ -1,0 +1,19 @@
+# @package _global_
+defaults:
+  - override /task: mnist
+  - override /policy: cnn
+  - override /solver: ga
+  
+solver:
+  selection: truncation
+  pop_size: 64
+  elite_size: 10
+  sigma: 0.001
+
+
+trainer:
+  max_iter: 5000
+  log_interval: 100
+  test_interval: 1000
+  n_repeats: 1
+  n_evaluations: 1

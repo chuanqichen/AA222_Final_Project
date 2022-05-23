@@ -1,0 +1,6 @@
+_target_: src.algo.genetic_algorithm.GeneticAlgorithm
+selection: truncation
+pop_size: ???
+elite_size: ???
+sigma: ???
+seed: ${seed}
