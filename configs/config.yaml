@@ -5,7 +5,7 @@ defaults:
   - trainer: trainer
   - hydra: base
   - wandb: disabled
-  - run: mnist # this changes task, policy, solver, trainer.*
+  - run: mnist_pgpe # this changes task, policy, solver, trainer.*
   - mode: train # this changes trainer.max_iter and wandb.mode
   - _self_
 
