@@ -4,11 +4,18 @@ defaults:
 
 job:
   name: ${get_class_name:${task}}_${get_class_name:${solver}}
+  config:
+    override_dirname:
+      exclude_keys:
+        - run
+        - mode
+        - trainer.max_iter
 run:
   dir: output/${get_class_name:${task}}/${get_class_name:${solver}}/${now:%Y-%m-%d_%H-%M-%S}
-# sweep:
-#   dir: multirun/${hydra.job.name}/${list2str:${data.features}}/${now:%Y-%m-%d_%H-%M-%S}
-#   subdir: ${hydra.job.override_dirname}
+sweep:
+  dir: multirun/${now:%Y-%m-%d_%H-%M-%S}/${hydra.job.name}/
+  subdir: ${hydra.job.override_dirname}
+
 # job_logging:
 #   formatters:
 #     simple:

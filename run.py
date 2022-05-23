@@ -13,11 +13,11 @@ OmegaConf.register_new_resolver("get_class_name", lambda x: x._target_.split("."
 
 @hydra.main(config_path="configs", config_name="config", version_base=None) # version base since I am using hydra 1.2
 def main(cfg):
-    cfg_dict = OmegaConf.to_container(
-        cfg, resolve=True, throw_on_missing=True)
+    cfg_dict = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
     wandb.init(**cfg.wandb, config= cfg_dict)    
 
     cfg_tree = HydraConfig.get()
+    log_dir = cfg_tree.runtime.output_dir
     if cfg.gpu_id is not None: 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
 
@@ -50,16 +50,17 @@ def main(cfg):
         solver = solver,
         train_task = train_task,
         test_task = test_task,
+        log_dir = log_dir
     )
 
     # Train the model
     trainer.run(demo_mode=False)
 
     # Test the final model.
-    src_file = os.path.join(cfg.log_dir, 'best.npz')
-    tar_file = os.path.join(cfg.log_dir, 'model.npz')
+    src_file = os.path.join(log_dir, 'best.npz')
+    tar_file = os.path.join(log_dir, 'model.npz')
     shutil.copy(src_file, tar_file)
-    trainer.model_dir = cfg.log_dir
+    trainer.model_dir = log_dir
     trainer.run(demo_mode=True)
 
     # * Save out a gif if doing control tasks like cartpole
@@ -86,7 +87,7 @@ def main(cfg):
                 images.append(test_task.render(task_s, 0))
 
         gif_file = os.path.join(
-            cfg.log_dir,
+            log_dir,
             'cartpole_{}.gif'.format('hard' if cfg.task.harder else 'easy')
         )
 

@@ -10,5 +10,4 @@ defaults:
   - _self_
 
 seed: 42
-log_dir: ${trainer.log_dir}
 gpu_id: 0
