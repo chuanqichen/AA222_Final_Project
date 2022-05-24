@@ -1,0 +1,4 @@
+_target_: src.algo.cross_entropy_method.CrossEntropyMethod
+pop_size: ???
+elite_size: ???
+seed: ${seed}

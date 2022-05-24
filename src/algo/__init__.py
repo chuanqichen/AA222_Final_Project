@@ -1,1 +1,2 @@
 from .genetic_algorithm import GeneticAlgorithm
+from .cross_entropy_method import CrossEntropyMethod
