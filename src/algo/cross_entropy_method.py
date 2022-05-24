@@ -1,8 +1,8 @@
+from functools import partial
 import logging
 import numpy as np
 from typing import Union, Tuple
 
-import distrax
 import jax
 import jax.numpy as jnp
 
@@ -10,6 +10,8 @@ from evojax.algo.base import NEAlgorithm
 from evojax.util import create_logger
 
 jnp_array = jax.jit(jnp.array)
+jnp_cov = jax.jit(partial(jnp.cov,rowvar=False))
+
 ndarray = Union[np.ndarray, jnp.ndarray]
 
 """
@@ -33,12 +35,11 @@ class CrossEntropyMethod(NEAlgorithm):
         self.rng_key = jax.random.PRNGKey(seed = seed)
         self.mu = jnp.zeros(param_size)
         self.sigma = jnp.eye(param_size)
-        # self.P = jax.distrax.MultivariateNormalFullCovariance(mu, sigma)
     
         def ask_fn(key: jnp.ndarray) -> Tuple[jnp.ndarray, ndarray]:
             key, subkey = jax.random.split(key)
-            params = jax.random.multivariate_normal(subkey, self.mu, self.sigma, shape=[self.pop_size])
-            # params = self.P.sample(subkey)
+            params = jax.random.multivariate_normal(subkey, self.mu, self.sigma, shape=[self.pop_size-1])
+            params = jnp.vstack((params, self.mu))
             return key, params
 
         def tell_fn(fitness: ndarray, params: ndarray) -> ndarray:
@@ -46,7 +47,7 @@ class CrossEntropyMethod(NEAlgorithm):
             params = params[-self.elite_size:]
             best_param = params[-1]
             mu = params.mean(axis=0)
-            sigma = jnp.cov(params, rowvar=False)
+            sigma = jnp_cov(params)
             return mu, sigma, best_param
 
         self.ask_fn = jax.jit(ask_fn)
