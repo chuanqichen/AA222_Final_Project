@@ -32,14 +32,13 @@ class CrossEntropyMethod(NEAlgorithm):
         self.pop_size = pop_size
         self.elite_size = elite_size
         self.rng_key = jax.random.PRNGKey(seed = seed)
+
         self.mu = jnp.zeros(param_size)
-        # self.mu = jax.random.normal(self.rng_key, (param_size,))
         self.sigma = jnp.eye(param_size)
     
-        def ask_fn(key: jnp.ndarray) -> Tuple[jnp.ndarray, ndarray]:
+        def ask_fn(key: jnp.ndarray, mu, sigma) -> Tuple[jnp.ndarray, ndarray]:
             key, subkey = jax.random.split(key)
-            params = jax.random.multivariate_normal(subkey, self.mu, self.sigma, shape=[self.pop_size-1])
-            params = jnp.vstack((params, self.mu))
+            params = jax.random.multivariate_normal(subkey, mu, sigma, shape=[self.pop_size])
             return key, params
 
         def tell_fn(fitness: ndarray, params: ndarray) -> ndarray:
@@ -54,7 +53,7 @@ class CrossEntropyMethod(NEAlgorithm):
         self.tell_fn = jax.jit(tell_fn)
 
     def ask(self) -> jnp.ndarray:
-        self.rng_key, self.params = self.ask_fn(self.rng_key)
+        self.rng_key, self.params = self.ask_fn(self.rng_key, self.mu, self.sigma)
         return self.params
 
     def tell(self, fitness: ndarray) -> None:
