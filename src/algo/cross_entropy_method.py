@@ -10,7 +10,7 @@ from evojax.algo.base import NEAlgorithm
 from evojax.util import create_logger
 
 jnp_array = jax.jit(jnp.array)
-jnp_cov = jax.jit(partial(jnp.cov,rowvar=False))
+jnp_cov = jax.jit(partial(jnp.cov,rowvar=False, bias=True))
 
 ndarray = Union[np.ndarray, jnp.ndarray]
 
@@ -19,7 +19,6 @@ CEM with multivariate normal proposal distribution, P
 P is represented by mu and sigma, rather than an object like distrax or tfp
 """
 class CrossEntropyMethod(NEAlgorithm):
-    
     def __init__(
         self,
         param_size: int,
@@ -34,6 +33,7 @@ class CrossEntropyMethod(NEAlgorithm):
         self.elite_size = elite_size
         self.rng_key = jax.random.PRNGKey(seed = seed)
         self.mu = jnp.zeros(param_size)
+        # self.mu = jax.random.normal(self.rng_key, (param_size,))
         self.sigma = jnp.eye(param_size)
     
         def ask_fn(key: jnp.ndarray) -> Tuple[jnp.ndarray, ndarray]:

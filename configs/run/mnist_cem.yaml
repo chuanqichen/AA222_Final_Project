@@ -5,8 +5,8 @@ defaults:
   - override /solver: cem
   
 solver:
-  pop_size: 64
-  elite_size: 16
+  pop_size: 128
+  elite_size: 32
   
 trainer:
   max_iter: 5000
