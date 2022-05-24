@@ -35,19 +35,21 @@ class CrossEntropyMethod(NEAlgorithm):
 
         self.mu = jnp.zeros(param_size)
         self.sigma = jnp.eye(param_size)
+        self.params = jnp.zeros((pop_size, param_size))
     
         def ask_fn(key: jnp.ndarray, mu, sigma) -> Tuple[jnp.ndarray, ndarray]:
             key, subkey = jax.random.split(key)
             params = jax.random.multivariate_normal(subkey, mu, sigma, shape=[self.pop_size])
             return key, params
 
-        def tell_fn(fitness: ndarray, params: ndarray) -> ndarray:
+        def tell_fn(fitness: ndarray, params: ndarray, rng_key) -> ndarray:
             params = params[fitness.argsort(axis=0)] 
             params = params[-self.elite_size:]
             best_param = params[-1]
             mu = params.mean(axis=0)
             sigma = jnp_cov(params)
-            return mu, sigma, best_param
+            # sigma += jax.random.normal(rng_key,sigma.shape) # Noisy CEM
+            return mu, sigma
 
         self.ask_fn = jax.jit(ask_fn)
         self.tell_fn = jax.jit(tell_fn)
@@ -57,7 +59,8 @@ class CrossEntropyMethod(NEAlgorithm):
         return self.params
 
     def tell(self, fitness: ndarray) -> None:
-        self.mu, self.sigma, self._best_params = self.tell_fn(fitness, self.params)
+        self.mu, self.sigma = self.tell_fn(fitness, self.params, self.rng_key)
+        self._best_params = self.mu
 
     @property
     def best_params(self) -> jnp.ndarray:
