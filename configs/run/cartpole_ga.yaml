@@ -1,0 +1,26 @@
+# @package _global_
+defaults:
+  - override /task: cartpole
+  - override /policy: mlp_pi
+  - override /solver: ga
+
+task:
+  harder: false
+  
+# policy:
+#   hidden_dim: 128
+# this only works for MLP_PI, not MLP. workaround is to hardcode in mlp.yaml
+  
+solver:
+  selection: truncation
+  pop_size: 64
+  elite_size: 10
+  sigma: 0.001
+
+
+trainer:
+  max_iter: 10000
+  log_interval: 100
+  test_interval: 1000
+  n_repeats: 16
+  n_evaluations: 100

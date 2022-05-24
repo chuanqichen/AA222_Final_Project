@@ -1,5 +1,4 @@
 import logging
-from select import select
 import numpy as np
 from typing import Union, Tuple
 
@@ -12,20 +11,12 @@ from evojax.util import create_logger
 """
 *Truncation
 *Each parent is randomly chosen from the top K chromosomes
-- Take top K chromies to produce next generation of N individuals. (K < N)
-- repeat N-1 times:
-    - sample a parent from top K, mutate it
-- For last individual: 
-    - select the best parent from top k (elitism)
-    - to ensure we get true elite, evaluate the K chromies additional x times
-
 
 *Tournament
 *Each parent is the fittest among K randomly chosen chromosomes
 
 *Roulette Wheel
 *Each parent is chosen with a prob proportional to its performance relative to the population
-Softmax Function is a common approach. 
 """
 jnp_array = jax.jit(jnp.array)
 ndarray = Union[np.ndarray, jnp.ndarray]
@@ -41,7 +32,7 @@ class GeneticAlgorithm(NEAlgorithm):
     def __init__(self,
                  param_size: int,
                  selection: str = "truncation",
-                 elitesm: bool = True,
+                 elitesm: bool = True, # not toggleable yet, defaults to yes
                  pop_size: int = 64,
                  elite_size: int = None,
                  sigma: float = 0.01,
