@@ -15,7 +15,7 @@ jnp_cov = jax.jit(partial(jnp.cov,rowvar=False, bias=True))
 ndarray = Union[np.ndarray, jnp.ndarray]
 
 """
-CEM with multivariate normal proposal distribution, P
+CEM with multivariate normal proposal distribution, P, using diagonal covariance matrix
 P is represented by mu and sigma, rather than an object like distrax or tfp
 """
 class CrossEntropyMethod(NEAlgorithm):
@@ -24,6 +24,7 @@ class CrossEntropyMethod(NEAlgorithm):
         param_size: int,
         pop_size: int = 64,
         elite_size: int = 10,
+        stdev_init: float = 1.0,
         seed: int = 0,
         logger: logging.Logger = None
     ):
@@ -34,7 +35,7 @@ class CrossEntropyMethod(NEAlgorithm):
         self.rng_key = jax.random.PRNGKey(seed = seed)
 
         self.mu = jnp.zeros(param_size)
-        self.sigma = jnp.eye(param_size)
+        self.sigma = jnp.eye(param_size) * stdev_init
         self.params = jnp.zeros((pop_size, param_size))
     
         def ask_fn(key: jnp.ndarray, mu, sigma) -> Tuple[jnp.ndarray, ndarray]:
@@ -45,11 +46,11 @@ class CrossEntropyMethod(NEAlgorithm):
         def tell_fn(fitness: ndarray, params: ndarray, rng_key) -> ndarray:
             params = params[fitness.argsort(axis=0)] 
             params = params[-self.elite_size:]
-            best_param = params[-1]
             mu = params.mean(axis=0)
-            sigma = jnp_cov(params)
-            # sigma += jax.random.normal(rng_key,sigma.shape) # Noisy CEM
-            return mu, sigma
+            # sigma = jnp_cov(params) # full covariance
+            sigma = params.var(axis=0)# diagonal covariance as a vector
+            sigma += abs(jax.random.normal(rng_key,sigma.shape)) # Noisy CEM
+            return mu, jnp.diagflat(sigma)
 
         self.ask_fn = jax.jit(ask_fn)
         self.tell_fn = jax.jit(tell_fn)
