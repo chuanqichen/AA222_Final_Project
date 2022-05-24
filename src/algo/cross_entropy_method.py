@@ -25,6 +25,7 @@ class CrossEntropyMethod(NEAlgorithm):
         pop_size: int = 64,
         elite_size: int = 10,
         stdev_init: float = 1.0,
+        noisy: bool = True, # adds noise to the covariance matrix: https://ieeexplore.ieee.org/document/6796865
         seed: int = 0,
         logger: logging.Logger = None
     ):
@@ -49,7 +50,8 @@ class CrossEntropyMethod(NEAlgorithm):
             mu = params.mean(axis=0)
             # sigma = jnp_cov(params) # full covariance
             sigma = params.var(axis=0)# diagonal covariance as a vector
-            sigma += abs(jax.random.normal(rng_key,sigma.shape)) # Noisy CEM
+            if noisy: 
+                sigma += abs(jax.random.normal(rng_key,sigma.shape)) # Noisy CEM
             return mu, jnp.diagflat(sigma)
 
         self.ask_fn = jax.jit(ask_fn)
