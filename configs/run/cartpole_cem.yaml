@@ -14,7 +14,7 @@ task:
 solver:
   pop_size: 128
   elite_size: 32
-  stdev_init: 1.0
+  stdev_init: 10.0
 
 trainer:
   max_iter: 10000
