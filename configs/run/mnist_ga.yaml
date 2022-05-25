@@ -7,8 +7,8 @@ defaults:
 solver:
   selection: truncation
   pop_size: 64
-  elite_size: 10
-  sigma: 0.001
+  elite_size: 16
+  sigma: 0.005
 
 
 trainer:

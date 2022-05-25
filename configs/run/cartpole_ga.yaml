@@ -13,9 +13,9 @@ task:
   
 solver:
   selection: truncation
-  pop_size: 64
-  elite_size: 10
-  sigma: 0.001
+  pop_size: 128
+  elite_size: 32
+  sigma: 0.005
 
 
 trainer:

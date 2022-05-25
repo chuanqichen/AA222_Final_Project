@@ -15,7 +15,7 @@ jnp_cov = jax.jit(partial(jnp.cov,rowvar=False, bias=True))
 ndarray = Union[np.ndarray, jnp.ndarray]
 
 """
-CEM with multivariate normal proposal distribution, P, using diagonal covariance matrix
+CEM with multivariate normal proposal distribution, P, using diagonal covariance matrix cuz i didn't know how to handle NaN full covariance matrix
 P is represented by mu and sigma, rather than an object like distrax or tfp
 """
 class CrossEntropyMethod(NEAlgorithm):
