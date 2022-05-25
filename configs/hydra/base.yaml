@@ -10,6 +10,8 @@ job:
         - run
         - mode
         - trainer.max_iter
+        - gpu_id
+        - seed
   # env_set:
   #   CUDA_VISIBLE_DEVICES: ${hydra:job.num}
 

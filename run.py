@@ -20,10 +20,11 @@ def main(cfg):
     log_dir = cfg_hydra.runtime.output_dir
 
     group = f"{cfg_hydra.job.name}-{id}" if "MULTIRUN" in str(cfg_hydra.mode) else None
-    run = wandb.init(**cfg.wandb, config= cfg_dict, reinit=True, group=group)    
+    name  = f"{cfg_hydra.job.override_dirname}" if "MULTIRUN" in str(cfg_hydra.mode) else None
+    run = wandb.init(**cfg.wandb, config= cfg_dict, reinit=True, group=group, name=name)    
 
     if cfg.gpu_id is not None: 
-        os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
     # os.environ['CUDA_VISIBLE_DEVICES'] = cfg_hydra.job.env_set.CUDA_VISIBLE_DEVICES
 
     train_task = instantiate(cfg.task, test = False)
