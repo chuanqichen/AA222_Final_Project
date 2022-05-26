@@ -30,6 +30,20 @@ cd evojax/
 python setup.py develop
 ```
 
+## Setup local wandb
+```
+Local Server 
+docker run --rm -d -v wandb:/vol -p 8080:8080 --name wandb-local wandb/local
+wandb local
+docker stop wandb-local
+```
+
+```
+Client PC to train and validate using wandb server 
+wandb login --host=http://wandb.local-host.com
+```
+
+
 ## Execution 
 ```
 run.py -m run=cartpole_ga solver.selection=truncation,tournament,roulette mode=train gpu_id=2
