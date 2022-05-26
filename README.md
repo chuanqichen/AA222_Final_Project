@@ -32,7 +32,11 @@ python setup.py develop
 
 ## Execution 
 ```
-python run.py +run=mnist +mode=debug
-python run.py +run=math +mode=debug
-python run.py +run=cartpole +mode=debug
+run.py -m run=cartpole_ga solver.selection=truncation,tournament,roulette mode=train gpu_id=2
+run.py -m run=mnist_cem mode=train gpu_id=1
+run.py -m run=mnist_ga solver.selection=truncation,tournament,roulette mode=train gpu_id=1
+run.py -m run=mnist_cem mode=train gpu_id=2
+run.py -m run=cartpole_cem mode=train task.harder=true,false
+run.py -m run=mnist_ga solver.selection=truncation,tournament,roulette
+run.py -m run=mnist_ga solver.selection=truncation,tournament,roulette trainer.max_iter=1100
 ```
